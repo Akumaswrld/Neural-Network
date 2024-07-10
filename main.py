@@ -19,17 +19,26 @@ class Layer:
     def get_output(self):
         return self.__output
 
+
+class ActivationFunction:
+    def forward(self, inputs):
+        self.__output = np.maximum(0, inputs)
+    
+    def get_forward_output(self):
+        return self.__output 
+
+
+class SoftmaxActivation:
+    def forward(self, layer_outputs):
+        exp_values = np.exp(layer_outputs - np.max(layer_outputs, axis=1, keepdims=True)) 
+        self.__output = exp_values / np.sum(exp_values, axis=1, keepdims=True)
+
+    def get_forward_output(self):
+        return self.__output
+
+
 def main():    
-    # initialises the 2 layers in our network 4 being the number of data points in each batch and 5 being the number of neurons in the layer
-    layer_1  = Layer(4,5)
-    layer_2  = Layer(5,6)
-
-    layer_1.forward(inputs = X)
-
-    layer_2.forward(inputs = layer_1.get_output())
-
-    print(layer_1.get_output())
-    print(layer_2.get_output())
+    pass
 
 if __name__ == '__main__':
     main()
