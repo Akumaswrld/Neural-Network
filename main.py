@@ -10,36 +10,30 @@ def main() -> None:
         [2.0, 5.0 ,-1.0, 2.0],
         [-1.5, 2.7, 3.3, -0.8]]
     
-    # initialising first Hidden Layer and its activation function 
-    layer_1 = Layer(4,5)
-    activation_1 = ActivationFunction()
+    layers = [
+        Layer(4,10),
+        Layer(10,10)
+    ]
 
-    # apply inputs*weights + biases -> Activation function (Relu in this case)
-    layer_1.forward(inputs=X)
-    layer_1_output = layer_1.get_output()
-    activation_1.forward(inputs=layer_1_output)
-    activation_1_output = activation_1.get_forward_output()
-
-    # initialising second Hidden layer and softmax activation function 
-    layer_2 = Layer(5,5)
-    activation_2 = SoftmaxActivation()
-
-    # just like before except this time we using softmax function -> e^(single output) / sum of all outputs raised to power of e -> giving a probability distribution
-    layer_2.forward(activation_1_output)
-    layer_2_output = layer_2.get_output()
-    activation_2.forward(layer_outputs=layer_2_output)
-    activation_2_output = activation_2.get_forward_output()
-
+    activations = [
+        ReLUActivation(),
+        SoftmaxActivation()
+    ]
+    
+    layer_output = Propagation.forward_propagate(input_data=X, layers=layers,activations=activations)
+        
     # this will calculate the loss of the data batch given to the network 
     batch_loss_calc = Loss()
-    batch_loss_calc.calculate(output=activation_2_output, intended_output=generate_one_hot_matrix(3,5))
+    batch_loss_calc.calculate(output=layer_output, intended_output=generate_one_hot_matrix(3,10))
     batch_loss = batch_loss_calc.get_loss()
     batch_accuracy = batch_loss_calc.get_accuracy()
     print('loss: ', batch_loss)
     print('Accuracy: ', batch_accuracy)
-    
 
-    
+    weights = [layer.get_weights() for layer in layers]
+    derivatives = [np.zeros_like(weight) for weight in weights]
+
+
 class Layer:
     def __init__(self, n_inputs, n_neurons):
         self.__weights = 0.1 * np.random.randn(n_inputs ,n_neurons)
@@ -50,13 +44,16 @@ class Layer:
     
     def get_output(self):
         return self.__output
-
-
-class ActivationFunction:
-    def forward(self, inputs):
-        self.__output = np.maximum(0, inputs)
     
-    def get_forward_output(self):
+    def get_weights(self):
+        return self.__weights
+
+
+class ReLUActivation:
+    def forward(self, layer_outputs):
+        self.__output = np.maximum(0, layer_outputs)
+    
+    def get_output(self):
         return self.__output 
 
 
@@ -64,10 +61,8 @@ class SoftmaxActivation:
     def forward(self, layer_outputs):
         exp_values = np.exp(layer_outputs - np.max(layer_outputs, axis=1, keepdims=True)) 
         self.__output = exp_values / np.sum(exp_values, axis=1, keepdims=True )
-        
-
     
-    def get_forward_output(self):
+    def get_output(self):
         return self.__output
 
 
@@ -104,13 +99,29 @@ class Loss:
         return self.__accuracy
     
 
+
+class Propagation:
+    def forward_propagate(layers, activations, input_data):
+        for i in range(len(layers)):
+            layers[i].forward(inputs=input_data)
+            layer_output = layers[i].get_output()
+            activations[i].forward(layer_outputs = layer_output)
+            input_data = activations[i].get_output()
+        
+        return input_data
+    def backward_propagate():
+        pass
+
+
 # for testing purposes
 
 def generate_one_hot_matrix(length, num_classes):
     matrix = np.zeros((length, num_classes), dtype=int)
     for i in range(length):
         matrix[i, randint(0, num_classes-1)] = 1
+    # print(matrix)
     return matrix
+
 
 if __name__ == '__main__':
      main()
