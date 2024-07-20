@@ -2,3 +2,4 @@ testing.py
 new.py
 mnist_test.csv
 mnist_train.csv
+model_params.npz

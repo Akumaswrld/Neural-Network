@@ -56,6 +56,20 @@ class NeuralNetwork:
 
         print(f'I am {value}% certain that this digit is a {index}')
 
+    def save_model(self, filename):
+        np.savez(filename,
+             layer1_weights=self.__layer_1.weights,
+             layer1_biases=self.__layer_1.biases,
+             layer2_weights=self.__layer_2.weights,
+             layer2_biases=self.__layer_2.biases)
+        
+    def load_model(self, filename):
+        data = np.load(filename)
+        self.__layer_1.weights = data['layer1_weights']
+        self.__layer_1.biases = data['layer1_biases']
+        self.__layer_2.weights = data['layer2_weights']
+        self.__layer_2.biases = data['layer2_biases']
+
 class Layers:
     def __init__(self, n_inputs, n_neurons):
         self.weights = np.random.randn(n_inputs, n_neurons) * np.sqrt(2.0 / n_inputs)
@@ -94,8 +108,8 @@ class Functions:
 
 
 def main() -> None:
-    data = np.array(pd.read_csv('mnist_train.csv', nrows=1000))
-    test = np.array(pd.read_csv('mnist_test.csv', nrows=20))
+    data = np.array(pd.read_csv('mnist_train.csv', nrows=1500))
+    test = np.array(pd.read_csv('mnist_test.csv', nrows=30))
     np.random.shuffle(data)
 
     
@@ -107,11 +121,13 @@ def main() -> None:
 
 
     neural_network = NeuralNetwork()
-    neural_network.train(learning_rate=0.15, epoches=100, input_data=data, targets=targets)
+    neural_network.load_model('model_params.npz')
+    # neural_network.train(learning_rate=0.15, epoches=90, input_data=data, targets=targets)
+
+    # neural_network.save_model('model_params.npz')
 
     for data in test:
         neural_network.predict(data=data)
-        
     print(test_targets)
     
 
