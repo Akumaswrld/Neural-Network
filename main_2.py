@@ -29,15 +29,15 @@ class NeuralNetwork:
         self.__layer_outputs = input_data # this is just so that it makes sense that were returning outputs rather than 'inputs' even though the variables hold the same values
         self.__activations.append(self.__layer_outputs)
         self.__pre_activations.append(self.__layer_outputs)
-        return self.__layer_outputs
+        
 
     def backward_propagate(self, input_data, intended_output):
         # first calculate the totoal batch loss 
         loss_function = Loss()
         loss_function.calculate(output=self.__layer_outputs, intended_output=intended_output)
-        error = loss_function.get_loss()
+        self.__error = loss_function.get_loss()
         delta_l2 = self.__layer_outputs - intended_output # loss gradient
-        print('error: ', error)
+
 
         # calculate the derivative of error with respect to each weight
         output_layer_activations = self.__activations[1]
@@ -51,9 +51,31 @@ class NeuralNetwork:
         self.__derivatives = [g_W1, g_W2]
         self.__bias_derivatives = [g_B1, g_B2]
 
+    
+    def gradient_descent(self, learning_rate):
+        for i in range(len(self.__layers)):
+            weights = self.__layers[i].get_weights()
+            biases = self.__layers[i].get_biases()
+
+            w_derivatives = self.__derivatives[i]
+            b_derivatives = self.__bias_derivatives[i]
+
+            weights -= learning_rate * w_derivatives
+            biases -= learning_rate * b_derivatives 
+
+            self.__layers[i].set_weights(weights)
+            self.__layers[i].set_biases(biases)
+            
+
+    def train(self, epochs, data, targets):
+        for i in range(epochs):
+            for inp, target in zip(data, targets):
+                self.forward_propagate(input_data=data)
+                self.backward_propagate(input_data=data, intended_output=target)
+                self.gradient_descent(learning_rate=0.1)
+
+            print(f'Error at epoch {i}: ', self.__error)
         
-    def train(self, epochs, learning_rate):
-        pass
 
 class Layer:
     def __init__(self, n_inputs, n_neurons):
@@ -72,6 +94,12 @@ class Layer:
     def get_biases(self):
         return self.__biases
     
+    def set_weights(self, new_weights):
+        self.__weights = new_weights
+
+    def set_biases(self, new_biases):
+        self.__biases = new_biases
+
 
 class ReLUActivation:
     def forward(self, layer_outputs):
@@ -108,7 +136,6 @@ class Loss:
         else:
             correct_values = np.sum(pred_clipped_values * true_values, axis=1)
         
-        self.calculate_accuracy(pred=pred, true_values=true_values)
         return -np.log(correct_values)
 
     def calculate_accuracy(self, pred, true_values):
@@ -133,20 +160,21 @@ def generate_one_hot_matrix(length, num_classes):
     # print(matrix)
     return matrix
 
-def main() -> None:    
-    # Initialises a random number generator around the parameter number (0) meaning that in future, we can get a random number that is distributed in a normal distribution centred at 0
-    np.random.seed(0)
+def one_hot(a_list):
+    one_hot_a_list = np.zeros((a_list.size, 10))
+    one_hot_a_list[np.arange(a_list.size), a_list] = 1
+    return one_hot_a_list
 
-    # Capitalised x denotes the training data 
-    dummy_data = np.array([[1.0, 2.0, 3.0, 2.5],
-                           [2.0, 5.0 ,-1.0, 2.0],
-                           [-1.5, 2.7, 3.3, -0.8]])
+def main() -> None:    
+    np.random.seed(0)
+    data = np.array([[randint(0, 20) for _ in range(4)] for _ in range(300)])
+    intended_results = np.array([randint(0, 9) for _ in range(300)])
+    one_hot_targets = one_hot(intended_results)
     
     neural_network = NeuralNetwork()
-    activations = neural_network.forward_propagate(input_data=dummy_data)
-    print(activations)
-    neural_network.backward_propagate(input_data=dummy_data, intended_output=generate_one_hot_matrix(3,10))
- 
+    neural_network.train(epochs=100, data=data, targets=one_hot_targets)
+    
+# def train(self, epochs, data, targets):
 
 if __name__ == '__main__':
     main()

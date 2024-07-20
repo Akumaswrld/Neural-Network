@@ -1,132 +1,126 @@
-import numpy as np 
-from random import randint
+import numpy as np
+import pandas as pd
 
-def main() -> None:    
-    # Initialises a random number generator around the parameter number (0) meaning that in future, we can get a random number that is distributed in a normal distribution centred at 0
-    np.random.seed(0)
+class NeuralNetwork:
+    def __init__(self):
+        self.__layer_1 = Layers(784, 10)
+        self.__layer_2 = Layers(10,10)
 
-    # Capitalised x denotes the training data 
-    X = [[1.0, 2.0, 3.0, 2.5],
-        [2.0, 5.0 ,-1.0, 2.0],
-        [-1.5, 2.7, 3.3, -0.8]]
-    
-    layers = [
-        Layer(4,10),
-        Layer(10,10)
-    ]
+    def forward_propagate(self, inputs):
+        self.layer_1_pre_activation = self.__layer_1.forward(inputs=inputs)
+        self.layer_1_activation = Functions.relu(pre_activations=self.layer_1_pre_activation)
 
-    activations = [
-        ReLUActivation(),
-        SoftmaxActivation()
-    ]
-    
-    layer_output = Propagation.forward_propagate(input_data=X, layers=layers,activations=activations)
+        self.layer_2_pre_activation = self.__layer_2.forward(inputs=self.layer_1_activation)
+        self.layer_2_activation = Functions.softmax(pre_activations=self.layer_2_pre_activation)
+
+        self.__final_output = self.layer_2_activation
+
+        return self.__final_output
+
+    def backward_propagate(self, inputs, targets): 
+        m = targets.size
+        targets_one_hot = Functions.one_hot(targets=targets)
+        delta_l2 = self.__final_output - targets_one_hot
+        g_W2 = (1/m) * np.dot(self.layer_1_activation.T, delta_l2)
+        g_B2 = (1/m) * np.sum(delta_l2, axis=0, keepdims=True)
+        delta_l1 = np.dot(delta_l2, self.__layer_2.weights.T) * Functions.relu_derivative(self.layer_1_pre_activation)
+        g_W1 = (1/m) * np.dot(inputs.T, delta_l1)
+        g_B1 = (1/m) * np.sum(delta_l1, axis=0, keepdims=True)
+
+        return g_W1, g_B1, g_W2, g_B2
+
+
+    def update_params(self, g_W1, g_B1, g_W2, g_B2, learning_rate): # also can be said that this is gradient descent
+        self.__layer_1.weights -= learning_rate * g_W1
+        self.__layer_1.biases -= learning_rate * g_B1
+        self.__layer_2.weights -= learning_rate * g_W2
+        self.__layer_2.biases -= learning_rate * g_B2 
         
-    # this will calculate the loss of the data batch given to the network 
-    batch_loss_calc = Loss()
-    batch_loss_calc.calculate(output=layer_output, intended_output=generate_one_hot_matrix(3,10))
-    batch_loss = batch_loss_calc.get_loss()
-    batch_accuracy = batch_loss_calc.get_accuracy()
-    print('loss: ', batch_loss)
-    print('Accuracy: ', batch_accuracy)
 
-    weights = [layer.get_weights() for layer in layers]
-    derivatives = [np.zeros_like(weight) for weight in weights]
+    def train(self, learning_rate, epoches, input_data, targets): # this is the method we use to train our model 
+        for n in range(epoches):
+            output = self.forward_propagate(inputs=input_data)
+            g_W1, g_B1, g_W2, g_B2 = self.backward_propagate(inputs= input_data, targets=targets)
+            self.update_params(g_W1, g_B1, g_W2, g_B2, learning_rate)
 
+            if n % 10 == 0:
+                loss = Functions.categorical_cross_entropy(predictions=output, targets=targets)
+                accuracy = Functions.accuracy(predictions=output, targets=targets)
+                print(f'loss in epoche {n}: ', loss)
+                print(f'accuracy: ', accuracy)
 
-class Layer:
+    def predict(self, data): # this is the method after the network has been trained so that it can predict 
+        prediction = self.forward_propagate(inputs = data)
+        index = np.argmax(prediction)
+        value = prediction[0][index] * 100
+
+        print(f'I am {value}% certain that this digit is a {index}')
+
+class Layers:
     def __init__(self, n_inputs, n_neurons):
-        self.__weights = 0.1 * np.random.randn(n_inputs ,n_neurons)
-        self.__biases = np.zeros((1, n_neurons))
-        
+        self.weights = np.random.randn(n_inputs, n_neurons) * np.sqrt(2.0 / n_inputs)
+        self.biases = np.zeros((1, n_neurons))
+
     def forward(self, inputs):
-        self.__output = np.dot(inputs, self.__weights) + self.__biases
+        return np.dot(inputs, self.weights) + self.biases
+
+
+class Functions:
+    def relu(pre_activations):
+        return np.maximum(0, pre_activations)
+
+    def relu_derivative(matrix):
+        return np.where(matrix > 0, 1, 0)
     
-    def get_output(self):
-        return self.__output
+    def softmax(pre_activations):
+        exp = np.exp(pre_activations - np.max(pre_activations, axis=1, keepdims=True))
+        return exp / np.sum(exp, axis=1, keepdims=True)
     
-    def get_weights(self):
-        return self.__weights
+    def categorical_cross_entropy(predictions, targets):
+        samples = len(predictions)
+        pred_clipped_values = np.clip(predictions, 1e-7, 1-(1e-7))
+        correct_values = pred_clipped_values[range(samples), targets]
+        log_values = -np.log(correct_values)
 
-
-class ReLUActivation:
-    def forward(self, layer_outputs):
-        self.__output = np.maximum(0, layer_outputs)
+        return np.mean(log_values)
     
-    def get_output(self):
-        return self.__output 
+    def accuracy(predictions, targets):
+        return np.mean(np.argmax(predictions, axis=1) == targets)
+    
+    def one_hot(targets):
+        one_hot_targets = np.zeros((targets.size, 10))
+        one_hot_targets[np.arange(targets.size), targets] = 1
+        return one_hot_targets
 
 
-class SoftmaxActivation:
-    def forward(self, layer_outputs):
-        exp_values = np.exp(layer_outputs - np.max(layer_outputs, axis=1, keepdims=True)) 
-        self.__output = exp_values / np.sum(exp_values, axis=1, keepdims=True )
+def main() -> None:
+    data = np.array(pd.read_csv('mnist_train.csv', nrows=1000))
+    test = np.array(pd.read_csv('mnist_test.csv', nrows=20))
+    np.random.shuffle(data)
 
     
-    def get_output(self):
-        return self.__output
+    targets = data[:, 0] 
+    data = data[:, 1:] / 255
+
+    test_targets = test[:, 0]
+    test = test[:, 1:] / 255
 
 
-class Loss:
-    def calculate(self, output, intended_output):
-        sample_losses = self.forward(pred=output, true_values=intended_output)
-        self.__data_loss = np.mean(sample_losses)
+    neural_network = NeuralNetwork()
+    neural_network.train(learning_rate=0.15, epoches=100, input_data=data, targets=targets)
+
+    for data in test:
+        neural_network.predict(data=data)
         
-
-    def forward(self, pred, true_values):
-        samples = len(pred)
-        pred_clipped_values = np.clip(pred, 1e-7, 1-(1e-7))
-
-        if len(true_values.shape) == 1:
-            correct_values = pred_clipped_values[range(samples), true_values]
-        else:
-            correct_values = np.sum(pred_clipped_values * true_values, axis=1)
-        
-        self.calculate_accuracy(pred=pred, true_values=true_values)
-        return -np.log(correct_values)
-    
-    def calculate_accuracy(self, pred, true_values):
-        if len(true_values) == 1:
-            self.__accuracy = np.mean(np.argmax(pred, axis=1) == true_values)
-        else:
-            self.__accuracy = np.mean(np.argmax(pred, axis=1) == np.argmax(true_values, axis=1))
-        
-        
-    def get_loss(self):
-        return self.__data_loss
-    
-    
-    def get_accuracy(self):
-        return self.__accuracy
+    print(test_targets)
     
 
+    
 
-class Propagation:
-    def forward_propagate(layers, activations, input_data):
-        for i in range(len(layers)):
-            layers[i].forward(inputs=input_data)
-            layer_output = layers[i].get_output()
-            activations[i].forward(layer_outputs = layer_output)
-            input_data = activations[i].get_output()
-        
-        return input_data
-    def backward_propagate():
-        pass
+    # (self, learning_rate, epoches, input_data, targets)
 
-
-# for testing purposes
-
-def generate_one_hot_matrix(length, num_classes):
-    matrix = np.zeros((length, num_classes), dtype=int)
-    for i in range(length):
-        matrix[i, randint(0, num_classes-1)] = 1
-    # print(matrix)
-    return matrix
 
 
 if __name__ == '__main__':
-     main()
-
-
-
+    main()
 
