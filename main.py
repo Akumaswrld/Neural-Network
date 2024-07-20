@@ -61,6 +61,7 @@ class SoftmaxActivation:
     def forward(self, layer_outputs):
         exp_values = np.exp(layer_outputs - np.max(layer_outputs, axis=1, keepdims=True)) 
         self.__output = exp_values / np.sum(exp_values, axis=1, keepdims=True )
+
     
     def get_output(self):
         return self.__output
