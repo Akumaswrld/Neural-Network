@@ -1,10 +1,11 @@
 import numpy as np
 import pandas as pd
+from PIL import Image, ImageOps
 
 class NeuralNetwork:
     def __init__(self):
-        self.__layer_1 = Layers(784, 10)
-        self.__layer_2 = Layers(10,10)
+        self.__layer_1 = Layers(784,128)
+        self.__layer_2 = Layers(128,10)
 
     def forward_propagate(self, inputs):
         self.layer_1_pre_activation = self.__layer_1.forward(inputs=inputs)
@@ -56,6 +57,8 @@ class NeuralNetwork:
 
         print(f'I am {value}% certain that this digit is a {index}')
 
+        return index
+
     def save_model(self, filename):
         np.savez(filename,
              layer1_weights=self.__layer_1.weights,
@@ -105,11 +108,22 @@ class Functions:
         one_hot_targets = np.zeros((targets.size, 10))
         one_hot_targets[np.arange(targets.size), targets] = 1
         return one_hot_targets
+    
+    def load_image(image_path):
+        with Image.open(image_path) as img:
+            img = img.convert('L')
+            img = img.resize((28,28), Image.LANCZOS)
+            img = ImageOps.invert(img)
+            img_array = np.array(img)
+            
 
+            return img_array.flatten()
+
+    
 
 def main() -> None:
-    data = np.array(pd.read_csv('mnist_train.csv', nrows=1500))
-    test = np.array(pd.read_csv('mnist_test.csv', nrows=30))
+    data = np.array(pd.read_csv('mnist_train.csv', nrows=15000))
+    test = np.array(pd.read_csv('mnist_test.csv', nrows=1000))
     np.random.shuffle(data)
 
     
@@ -122,18 +136,23 @@ def main() -> None:
 
     neural_network = NeuralNetwork()
     neural_network.load_model('model_params.npz')
-    # neural_network.train(learning_rate=0.15, epoches=90, input_data=data, targets=targets)
+    #neural_network.train(learning_rate=0.8, epoches=500, input_data=data, targets=targets)
+    #neural_network.save_model('model_params.npz')
 
-    # neural_network.save_model('model_params.npz')
 
-    for data in test:
-        neural_network.predict(data=data)
-    print(test_targets)
+    img = Functions.load_image('image.png') / 255
+    neural_network.predict(img)
+
+    #results = []
+    #for test_case in test:
+       # result = neural_network.predict(test_case)
+      #  results.append(result)
+    #accuracy = sum(test_targets == results) / len(results)
+    #print(f'this model has an accuracy of: {accuracy}%')
+    
+    
     
 
-    
-
-    # (self, learning_rate, epoches, input_data, targets)
 
 
 

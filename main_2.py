@@ -1,5 +1,6 @@
 import numpy as np 
 from random import randint
+from PIL import image
 
 class NeuralNetwork:
     def __init__(self):
