@@ -6,16 +6,11 @@ This is my shortened documentation of my model
 
  MODULES USED:
  the modules i used are minimal, no large machine learning library was used as that beats the whole purpose of why im doing this. All i used was:
- - numpy
- - pandas 
- - PIL
- Numpy:
- this module was used to do all the complex matrix operations for us most optimally 
- Pandas:
- i used pandas to import parts of the data from the large data set without having to import the whole dataset into my memory every time i trained the model
- PIL:
- i only used PIL right at the end to test the model using my own hand written digits
+ - numpy: this module was used to do all the complex matrix operations for us most optimally 
+ - pandas: i used pandas to import parts of the data from the large data set without having to import the whole dataset into my memory every time i trained the model
+ - PIL: i only used PIL right at the end to test the model using my own hand written digits
  this failed horribly because i had to reformat the image so its 28x28, at first i thought this would be fine but then my model that had 95% accuracy on testing data, was performing at less than 50% on my own images, i then used PIL to show me the image and oh god, i couldnt even tell what the digit was myself. So i was limited to using testing data provided by the data set
+
 
  NEURAL NETWORK CLASS:
  this is the main neural network class as you can probably tell, when an instance of the class is made, this is the actual model, it will initialise all the hidden layers using Layers objects (will explain more about this when i talk about the layers class)
