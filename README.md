@@ -1,4 +1,4 @@
-# Neural-Network-Attempt
+# Neural-Network
 This is my short documentation on my code (ignore misspellings or typos, i wrote this at 2am)
  
  INTRODUCTION:
