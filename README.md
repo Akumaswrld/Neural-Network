@@ -4,7 +4,8 @@ This is my short documentation on my code (ignore misspellings or typos, i wrote
  # INTRODUCTION:
  This neural network is a multi class classification model that can classify digits 0-9 using the mnist large data set. It took me around 2 months to learn the theory needed to build the model and actually implementing it took around 2-3 weeks. In this document i will be explaining all the functions/classes and a bit of the theory behind them (obviously not in crazy detail, im saving that for my real NEA)
 
- <u>***MODULES USED***:</u>
+ ***MODULES USED***:
+
  the modules i used are minimal, no large machine learning library was used as that beats the whole purpose of why im doing this. All i used was:
  - numpy: this module was used to do all the complex matrix operations for us most optimally 
  - pandas: i used pandas to import parts of the data from the large data set without having to import the whole dataset into my memory every time i trained the model
