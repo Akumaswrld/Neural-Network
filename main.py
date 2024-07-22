@@ -123,7 +123,7 @@ class Functions:
 
 def main() -> None:
     data = np.array(pd.read_csv('mnist_train.csv', nrows=15000))
-    test = np.array(pd.read_csv('mnist_test.csv', nrows=30))
+    test = np.array(pd.read_csv('mnist_test.csv', nrows=4000))
     np.random.shuffle(data)
 
     
