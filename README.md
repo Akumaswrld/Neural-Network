@@ -1,5 +1,5 @@
 # Handwritten Digit Classification Model
-This is my short documentation on my code (ignore misspellings or typos, i wrote this at 2am get out of here)
+This is my short documentation on my code (ignore misspellings or typos, i wrote this at 2am)
  
  # INTRODUCTION:
  This neural network is a multi class classification model that can classify digits 0-9 using the mnist large data set. It took me around 2 months to learn the theory needed to build the model and actually implementing it took around 2-3 weeks. In this document i will be explaining all the functions/classes and a bit of the theory behind them (obviously not in crazy detail, im saving that for my real NEA)
