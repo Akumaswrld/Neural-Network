@@ -16,7 +16,7 @@ This is my short documentation on my code (ignore misspellings or typos, i wrote
  # NEURAL NETWORK CLASS:
  this is the main neural network class as you can probably tell, when an instance of the class is made, this is the actual model, it will initialise all the hidden layers using Layers objects (will explain more about this when i talk about the layers class)
     
-**forward_propagate method:**
+***forward_propagate method:***
 
 this is the first actual function performed by the neural network, the input data is passed through the network from the input layer through the hidden layers and an output is produced by the output layer.
 
@@ -38,7 +38,7 @@ for my model, i decided to go for ReLU for the activation of the first hidden la
 
 once this is all computed the softmax activation returns a probability distribution of its certainty of what the outcome should be.
 
-**backward_propagate method:**
+***backward_propagate method:***
 
 the mechanics of how backward propagation works is that it calculates the loss of the model (how far it was off the actual output), then it calculates the derivative of the loss function with respect to every weight in each layer and find where the derivative is the most negative (slopes downwards the most) as this is where the the loss function would be at its lowest so in turn the loss of the model will be at a minimum. The gradient is then multiplied by a hyperparemeter known as the learning rate and this is taken away from the corresponding weight in the corresponding layer.
 
@@ -54,11 +54,11 @@ This is where propagating the loss through the layers comes in, to find the deri
 
 these two are then multiplied with each other and divided by the batch size
 
-**update_params method:**
+***update_params method:***
 
 this method just takes the derivatives from back prop, multiplies them by a hyper parameter (learning rate) and takes this away from the corresponding weights from the corresponding layer 
 
-**train method:**
+***train method:***
 
 takes 4 parameters: learning_rate, epoches, input_data and targets
 - learning rate: a hyperparameter that dictates how far the weights are tweaked after each iteration, it is important for this to be optimal for the model so that it can converge at a local minima (if set too high, it could potentially diverge and if too low, it may never converge)
@@ -70,22 +70,22 @@ the train method applies forward and back propagation to the same data for many 
 
 after every 10 iterations, the loss and accuracy of the model in that iteration are printed into terminal just to give an update on the training of the model 
 
-**predict method:**
+***predict method:***
 
 once training is finished, you can use the predict method to test the accuracy of the model on data it has never seen before to ensure that no overfitting has occurred, this method outputs the prediction along with the probability 
 
-**save_model method:**
+***save_model method:***
 
 after training and testing is done, if the weights and biases produce an accurate result in the testing phase, you can save the weights and biases into a .npz file (a file format to store numpy arrays)
 
-**load_model method:**
+***load_model method:***
 
 simply loads a model from a .npz file 
  
 # LAYERS CLASS:
 this is a class of layers, initialised with 2 dimensions, the number of rows being the number of inputs it will receive and columns being the number of nodes in that layer (this is to ensure that the dimensions are correct to perform matrix multiplication with the input matrix). With these dimensions, a set of weights are randomly initialised and with the same dimensions, a matrix of 0's is created as the initial biases
 
-**forward method:**
+***forward method:***
 
 this simply performs the input * weight + bias i spoke about in forward propagation 
 
@@ -94,28 +94,28 @@ this simply performs the input * weight + bias i spoke about in forward propagat
 # FUNCTIONS CLASS:
 this is a class of static methods that i just for general organisation, this includes all the functions that are required for forward and back prop to work that are did not directly need to be related to the neural network class for example, one_hot_encoding, this is just a general method. However i am still uncertain whether i shouldve included the activation functions here, but it still worked out fine so i guess theyll stay there
 
-**relu method:**
+***relu method:***
 
 this takes a numpy array as an input and applies the relu function to every value inside the array. If the value if less than or equal to 0, it is set to a 0 else it is left unchanged.
 
-**relu_derivative method:**
+***relu_derivative method:***
 
 this takes a numpy array and calculates the gradient of each value in the array, if the value is 0, the gradient is 0 or less, the derivative will be set to a 0 else it would be set to a 1.
 
-**softmax method:**
+***softmax method:***
 
 this one is very important:
 the issue: what i want to do is form a probability distribution based on the data provided, however we may have some negative values flying around so we cannot simply sum these values together because it will result in an inaccurate representation of all the values. At the same time, we cannot simply take the modulus of the negative values because now a -5 will have the same impact as a +5 which will cause many problems. So instead, we take e^(value) because (as e^x > 0 for all real values of x) we will only have positive values without the previously negative values losing the significance of their negativity. However, quickly we run into another problem, what if the value is relatively big? This will cause e^(value) to quickly shoot off to a large value which may cause problems with our neural network or may even result in the number being too big for the program to store it. So before we exponentiate each value, we take away from it the largest number in the set, therefore we will only have numbers less than 0 and will stop the exponential function from creating absurdly large values. This will not effect our final outcome as we are taking away a set quantity from each value (not multiplying or dividing) so its like shifting every number down in the number line by x amount, by doing all this, the exponential function will only give is values between 0 and 1 which will not cause any problems for our model. Now we do what we'd do for any probability distribution, we divide each value by the sum of all the values in that set.
 
-**categorical_cross_entropy method:**
+***categorical_cross_entropy method:***
 
 since we know that the predictions parameter will always be an matrix of numbers between 0-1 (softmax activation), we get the probability of the actual output we want and take the - of the natural log of that value. However, what if the value is 0? recall that the domain of the Ln function is x > 0, so if we enter 0 into the natural log function, it would break. This is where we create an interval where all the values should fit this being 1 x 10^-7 and 1-(1 x 10^-7), this means every value will now be between these 2 numbers thus the log function will never be getting a 0 inputted. The value at the end is the loss of the model in that iteration which is outputted in the terminal when training the model. Other than that i dont think its ever used, i was initially going to use this for loss in back propagation but i realised that what i was doing was incorrect.
 
-**accuracy method:**
+***accuracy method:***
 
 return a % of how many predictions the model got in a batch 
 
-**one_hot method:**
+***one_hot method:***
 
 takes a 1 dimensional vector and one hot encodes it for example:
 array = [1,3,4]
@@ -124,7 +124,7 @@ one_hot_array = [[0,1,0,0,0],
                     [0,0,0,0,1]]
 each value in the vector is an 'index' of the correct output, one hot creates a vector for each value where there is a 1 in the index given by the value
 
-**load_image method:**
+***load_image method:***
 
 used PIL library to import and use my own pictures (this did not work out well), i did this by getting the image and then reformatting it to 28x28 which is the format given by the dataset and the format that my model has been trained on. I then turn this into a numpy array where each value represents a pixel. I then flattened this matrix into a vector which is the format which is given by the data set.
 
