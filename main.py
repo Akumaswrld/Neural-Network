@@ -7,7 +7,7 @@ class NeuralNetwork:
         self.__layer_1 = Layers(784,128)
         self.__layer_2 = Layers(128,10)
 
-    def forward_propagate(self, inputs):
+    def forward_propagate(self, inputs): 
         self.layer_1_pre_activation = self.__layer_1.forward(inputs=inputs)
         self.layer_1_activation = Functions.relu(pre_activations=self.layer_1_pre_activation)
 
@@ -31,14 +31,14 @@ class NeuralNetwork:
         return g_W1, g_B1, g_W2, g_B2
 
 
-    def update_params(self, g_W1, g_B1, g_W2, g_B2, learning_rate): # also can be said that this is gradient descent
+    def update_params(self, g_W1, g_B1, g_W2, g_B2, learning_rate): 
         self.__layer_1.weights -= learning_rate * g_W1
         self.__layer_1.biases -= learning_rate * g_B1
         self.__layer_2.weights -= learning_rate * g_W2
         self.__layer_2.biases -= learning_rate * g_B2 
         
 
-    def train(self, learning_rate, epoches, input_data, targets): # this is the method we use to train our model 
+    def train(self, learning_rate, epoches, input_data, targets): 
         for n in range(epoches):
             output = self.forward_propagate(inputs=input_data)
             g_W1, g_B1, g_W2, g_B2 = self.backward_propagate(inputs= input_data, targets=targets)
@@ -50,7 +50,7 @@ class NeuralNetwork:
                 print(f'loss in epoche {n}: ', loss)
                 print(f'accuracy: ', accuracy)
 
-    def predict(self, data): # this is the method after the network has been trained so that it can predict 
+    def predict(self, data): 
         prediction = self.forward_propagate(inputs = data)
         index = np.argmax(prediction)
         value = prediction[0][index] * 100
@@ -123,7 +123,7 @@ class Functions:
 
 def main() -> None:
     data = np.array(pd.read_csv('mnist_train.csv', nrows=15000))
-    test = np.array(pd.read_csv('mnist_test.csv', nrows=1000))
+    test = np.array(pd.read_csv('mnist_test.csv', nrows=30))
     np.random.shuffle(data)
 
     
@@ -136,26 +136,19 @@ def main() -> None:
 
     neural_network = NeuralNetwork()
     neural_network.load_model('model_params.npz')
+
     #neural_network.train(learning_rate=0.8, epoches=500, input_data=data, targets=targets)
     #neural_network.save_model('model_params.npz')
 
+    results = []
+    for test_case in test:
+        result = neural_network.predict(test_case)
+        results.append(result)
+    accuracy = sum(test_targets == results) / len(results)
+    print(f'this model has an accuracy of: {accuracy}%')
 
-    img = Functions.load_image('image.png') / 255
-    neural_network.predict(img)
-
-    #results = []
-    #for test_case in test:
-       # result = neural_network.predict(test_case)
-      #  results.append(result)
-    #accuracy = sum(test_targets == results) / len(results)
-    #print(f'this model has an accuracy of: {accuracy}%')
     
     
-    
-
-
-
-
 if __name__ == '__main__':
     main()
 
