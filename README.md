@@ -12,7 +12,7 @@ This is my short documentation on my code (ignore misspellings or typos, i wrote
  this failed horribly because i had to reformat the image so its 28x28, at first i thought this would be fine but then my model that had 95% accuracy on testing data, was performing at less than 50% on my own images, i then used PIL to show me the image and oh god, i couldnt even tell what the digit was myself. So i was limited to using testing data provided by the data set
 
 
- NEURAL NETWORK CLASS:
+ # NEURAL NETWORK CLASS:
  this is the main neural network class as you can probably tell, when an instance of the class is made, this is the actual model, it will initialise all the hidden layers using Layers objects (will explain more about this when i talk about the layers class)
     
     # forward_propagate method:
@@ -74,13 +74,17 @@ This is my short documentation on my code (ignore misspellings or typos, i wrote
     # load_model method
     simply loads a model from a .npz file 
  
- LAYERS CLASS:
+# LAYERS CLASS:
     this is a class of layers, initialised with 2 dimensions, the number of rows being the number of inputs it will receive and columns being the number of nodes in that layer (this is to ensure that the dimensions are correct to perform matrix multiplication with the input matrix). With these dimensions, a set of weights are randomly initialised and with the same dimensions, a matrix of 0's is created as the initial biases
+
     # forward method:
         this simply performs the input * weight + bias i spoke about in forward propagation 
 
- FUNCTIONS CLASS:
+
+
+# FUNCTIONS CLASS:
     this is a class of static methods that i just for general organisation, this includes all the functions that are required for forward and back prop to work that are did not directly need to be related to the neural network class for example, one_hot_encoding, this is just a general method. However i am still uncertain whether i shouldve included the activation functions here, but it still worked out fine so i guess theyll stay there
+
     # relu method:
         this takes a numpy array as an input and applies the relu function to every value inside the array. If the value if less than or equal to 0, it is set to a 0 else it is left unchanged.
 
@@ -109,7 +113,7 @@ This is my short documentation on my code (ignore misspellings or typos, i wrote
         used PIL library to import and use my own pictures (this did not work out well), i did this by getting the image and then reformatting it to 28x28 which is the format given by the dataset and the format that my model has been trained on. I then turn this into a numpy array where each value represents a pixel. I then flattened this matrix into a vector which is the format which is given by the data set.
 
 
-One big issue:
+# Issues:
     one issue i had with the model was when i had 'finished' the whole model bearing in mind this was my 4th attempt of making this model. When i first tried to train the model i had an issue where i could see the model converging to a minimum loss however after 100 iterations it would oscillate between 2 loss values forever and the model was never learning. After hours of researching, i realised i had to normalise the data for my model to be efficient with it. Basically in the data set, each pixel has a value 0-255, 0 being white and 255 being black and shades of gray in between, so i had to divide all of the values by 255 so that i will only have values between 0 and 1. As soon as i made a change, i saw a convergence of 89% accuracy after 50 iterations. 
 
 After 2 days of testing and tweaking hyper parameters, I have managed to train my model so that it can classify unseen testing data with 95% accuracy
