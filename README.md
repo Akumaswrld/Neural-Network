@@ -1,4 +1,4 @@
-# Handwritten Digit Classification Model By Assem
+# Handwritten Digit Classification Model
 This is my short documentation on my code (ignore misspellings or typos, i wrote this at 2am)
  
  # INTRODUCTION:
@@ -7,9 +7,9 @@ This is my short documentation on my code (ignore misspellings or typos, i wrote
  ***MODULES USED***:
 
  the modules i used are minimal, no large machine learning library was used as that beats the whole purpose of why im doing this. All i used was:
- - numpy: this module was used to do all the complex matrix operations for us most optimally 
- - pandas: i used pandas to import parts of the data from the large data set without having to import the whole dataset into my memory every time i trained the model
- - PIL: i only used PIL right at the end to test the model using my own hand written digits
+ - **Numpy:** this module was used to do all the complex matrix operations for us most optimally 
+ - **Pandas:** i used pandas to import parts of the data from the large data set without having to import the whole dataset into my memory every time i trained the model
+ - **PIL:** i only used PIL right at the end to test the model using my own hand written digits
  this failed horribly because i had to reformat the image so its 28x28, at first i thought this would be fine but then my model that had 95% accuracy on testing data, was performing at less than 50% on my own images, i then used PIL to show me the image and oh god, i couldnt even tell what the digit was myself. So i was limited to using testing data provided by the data set
 
 
