@@ -9,9 +9,6 @@ This is my short documentation on my code (ignore misspellings or typos, i wrote
  the modules i used are minimal, no large machine learning library was used as that beats the whole purpose of why im doing this. All i used was:
  - **Numpy:** this module was used to do all the complex matrix operations for us most optimally 
  - **Pandas:** i used pandas to import parts of the data from the large data set without having to import the whole dataset into my memory every time i trained the model
- - **PIL:** i only used PIL right at the end to test the model using my own hand written digits
- this failed horribly because i had to reformat the image so its 28x28, at first i thought this would be fine but then my model that had 95% accuracy on testing data, was performing at less than 50% on my own images, i then used PIL to show me the image and oh god, i couldnt even tell what the digit was myself. So i was limited to using testing data provided by the data set
-
 
  # NEURAL NETWORK CLASS:
  this is the main neural network class as you can probably tell, when an instance of the class is made, this is the actual model, it will initialise all the hidden layers using Layers objects (will explain more about this when i talk about the layers class)
@@ -123,10 +120,6 @@ one_hot_array = [[0,1,0,0,0],
                     [0,0,0,1,0],
                     [0,0,0,0,1]]
 each value in the vector is an 'index' of the correct output, one hot creates a vector for each value where there is a 1 in the index given by the value
-
-***load_image method:***
-
-used PIL library to import and use my own pictures (this did not work out well), i did this by getting the image and then reformatting it to 28x28 which is the format given by the dataset and the format that my model has been trained on. I then turn this into a numpy array where each value represents a pixel. I then flattened this matrix into a vector which is the format which is given by the data set.
 
 
 # Issues:

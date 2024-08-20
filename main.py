@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-from PIL import Image, ImageOps
 
 class NeuralNetwork:
     def __init__(self):
@@ -109,17 +108,7 @@ class Functions:
         one_hot_targets[np.arange(targets.size), targets] = 1
         return one_hot_targets
     
-    def load_image(image_path):
-        with Image.open(image_path) as img:
-            img = img.convert('L')
-            img = img.resize((28,28), Image.LANCZOS)
-            img = ImageOps.invert(img)
-            img_array = np.array(img)
-            
 
-            return img_array.flatten()
-
-    
 
 def main() -> None:
     data = np.array(pd.read_csv('mnist_train.csv', nrows=15000))
